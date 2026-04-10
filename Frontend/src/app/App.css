@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+/* We only need standard tailwind directives now.
+   All previous custom styling is removed for the minimal, seamless Tailwind design. */
+
+@layer base {
+  body {
+    @apply bg-white text-gray-900 font-sans antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+/* Minimal markdown styling */
+.md-prose p {
+  @apply mb-4 leading-relaxed;
+}
+.md-prose p:last-child {
+  @apply mb-0;
+}
+.md-prose strong {
+  @apply font-semibold text-gray-900;
+}
+.md-prose em {
+  @apply italic text-gray-700;
+}
+.md-prose ul {
+  @apply list-disc pl-5 mb-4 space-y-1;
+}
+.md-prose ul:last-child {
+  @apply mb-0;
+}
