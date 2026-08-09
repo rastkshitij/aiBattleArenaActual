@@ -24,8 +24,8 @@ const solutionNode: GraphNode<typeof state> = async (state) => {
     ])
 
     return {
-        solution_1: mistralResponse.text,
-        solution_2: cohereResponse.text,
+        solution_1: String((mistralResponse as any).text ?? ''),
+        solution_2: String((cohereResponse as any).text ?? ''),
     }
 }
 
@@ -33,7 +33,7 @@ const judgeNode: GraphNode<typeof state> = async (state) => {
     const { problem, solution_1, solution_2 } = state
 
     const judge = createAgent({
-        model: geminiModel,
+        model: geminiModel as any,
         responseFormat: providerStrategy(z.object({
             solution_1_score: z.number().min(0).max(10),
             solution_2_score: z.number().min(0).max(10),
@@ -80,12 +80,10 @@ const graph = new StateGraph(state)
     .addEdge("judge_node", END)
     .compile()
 
-export default async function (problem: string) { 
-
-    const result = await graph.invoke({
+export default async function (problem: string) {
+    const result = await (graph as any).invoke({
         problem: problem
-    })
+    });
 
-    return result
-
+    return result;
 }

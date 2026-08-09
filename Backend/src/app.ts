@@ -1,37 +1,33 @@
 import express from "express";
-import graph from "./ai/graph.ai.js"
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import morgan from "morgan";
-const app = express()
+import config from "./config/config.js";
+import authRoutes from "./routes/auth.routes.js";
+import chatRoutes from "./routes/chat.routes.js";
+import aiRoutes from "./routes/ai.routes.js";
+import { requireAuth } from "./middleware/auth.middleware.js";
+import { invokeAI } from "./controllers/ai.controller.js";
 
-app.use(morgan("dev"))
-app.use(express.json())
+const app = express();
+
+app.use(morgan("dev"));
+app.use(express.json());
+app.use(cookieParser());
 app.use(
   cors({
-    origin : "http://localhost:5173" ,
-    Credential :true
+    origin: config.CLIENT_URL,
+    credentials: true,
   })
-)
+);
 
+app.get("/", async (_req, res) => {
+  res.status(200).json({ message: "AI Battle Arena API is running" });
+});
 
+app.use("/api/auth", authRoutes);
+app.use("/api/chats", chatRoutes);
+app.use("/api/ai", aiRoutes);
+app.post("/invoke", requireAuth, invokeAI);
 
-
-app.get("/" , async (req , res)=>{
-  const result = await graph("What is the capital of india")
-  console.log(result)
-  res.status(201).json({
-    result
-  })
-})
-
-app.post("/invoke" , async (req , res)=>{
-const { input } = req.body
-const  result = await graph(input)
-res.status(200).json({
-  message :  "Graph executed succesfully" ,
-  success : true ,
-  result
-})
-})
-
-export default app
+export default app;
