@@ -65,7 +65,7 @@ function inlineMarkdown(text) {
 
 function ScoreLabel({ score }) {
   return (
-    <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800 border border-gray-200">
+    <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#222] text-gray-300 border border-[#333]">
       {score}/10
     </span>
   )
@@ -75,10 +75,10 @@ function SolutionPanel({ modelName, text }) {
   return (
     <div className="flex-1 p-6 md:p-8">
       <div className="flex items-center gap-2 mb-4">
-        <div className={`w-2 h-2 rounded-full ${modelName === 'Model A' ? 'bg-blue-500' : 'bg-purple-500'}`} />
-        <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">{modelName}</h3>
+        <div className={`w-2 h-2 rounded-full ${modelName === 'Model A' ? 'bg-cyan-500' : 'bg-purple-500'}`} />
+        <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wide">{modelName}</h3>
       </div>
-      <div className="md-prose text-gray-700 text-[15px]">
+      <div className="md-prose text-gray-300 text-[15px]">
         {renderMarkdown(text)}
       </div>
     </div>
@@ -87,19 +87,19 @@ function SolutionPanel({ modelName, text }) {
 
 function JudgeVerdict({ judge }) {
   return (
-    <div className="border-t border-gray-100 bg-gray-50/50 p-6 md:p-8">
+    <div className="border-t border-[#222] bg-[#0F0F0F] p-6 md:p-8">
       <div className="flex items-center gap-2 mb-6">
         <span className="text-lg">⚖️</span>
-        <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-widest">Judge Verdict</h3>
+        <h3 className="text-sm font-semibold text-gray-200 uppercase tracking-widest">Judge Verdict</h3>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
         {/* Model A Verdict */}
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-600">Model A</span>
+            <span className="text-sm font-medium text-gray-400">Model A</span>
             <ScoreLabel score={judge.solution_1_score} />
           </div>
-          <p className="text-sm text-gray-600 leading-relaxed">
+          <p className="text-sm text-gray-400 leading-relaxed">
             {judge.solution_1_reasoning}
           </p>
         </div>
@@ -107,10 +107,10 @@ function JudgeVerdict({ judge }) {
         {/* Model B Verdict */}
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-600">Model B</span>
+            <span className="text-sm font-medium text-gray-400">Model B</span>
             <ScoreLabel score={judge.solution_2_score} />
           </div>
-          <p className="text-sm text-gray-600 leading-relaxed">
+          <p className="text-sm text-gray-400 leading-relaxed">
             {judge.solution_2_reasoning}
           </p>
         </div>
@@ -121,8 +121,8 @@ function JudgeVerdict({ judge }) {
 
 function BattleCard({ result }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mt-6 mb-12 transform transition-all hover:shadow-md">
-      <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-gray-100">
+    <div className="bg-[#141414] rounded-2xl border border-[#222] shadow-sm overflow-hidden mt-6 mb-12 transform transition-all hover:border-[#333]">
+      <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-[#222]">
         <SolutionPanel modelName="Model A" text={result.solution_1} />
         <SolutionPanel modelName="Model B" text={result.solution_2} />
       </div>
@@ -171,15 +171,15 @@ export default function App() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50/30 selection:bg-gray-100 font-sans">
+    <div className="flex flex-col h-screen bg-[#0A0A0A] font-sans selection:bg-[#333] selection:text-white">
       
       {/* Header Minimal */}
-      <header className="flex-shrink-0 sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+      <header className="flex-shrink-0 sticky top-0 z-10 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-[#222] px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600">
+          <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#141414] border border-[#222] text-gray-400 text-sm">
             ❋
           </div>
-          <span className="font-semibold text-gray-900 tracking-tight">AI Battle Arena</span>
+          <span className="font-semibold text-gray-200 tracking-tight">AI Battle Arena</span>
         </div>
       </header>
 
@@ -190,7 +190,7 @@ export default function App() {
           {messages.map((msg) => (
             <div key={msg.id} className="flex flex-col w-full opacity-0 animate-[fadeIn_0.5s_ease-out_forwards]">
               {/* User message */}
-              <div className="self-end max-w-2xl bg-white px-6 py-4 rounded-2xl rounded-tr-sm border border-gray-100 shadow-sm text-gray-800 text-[15px] leading-relaxed relative">
+              <div className="self-end max-w-2xl bg-[#1A1A1A] px-6 py-4 rounded-2xl rounded-tr-sm border border-[#333] shadow-sm text-gray-200 text-[15px] leading-relaxed relative">
                 {msg.problem}
               </div>
 
@@ -199,7 +199,7 @@ export default function App() {
               
               {/* Error State */}
               {msg.error && (
-                <div className="mt-4 mb-12 self-start bg-red-50 text-red-600 px-4 py-3 rounded-lg text-sm border border-red-100">
+                <div className="mt-4 mb-12 self-start bg-red-950/30 text-red-500 px-4 py-3 rounded-lg text-sm border border-red-900/50">
                   {msg.error}
                 </div>
               )}
@@ -208,11 +208,11 @@ export default function App() {
 
           {/* Loading State */}
           {isLoading && (
-            <div className="self-start mt-6 mb-12 bg-white px-6 py-4 rounded-2xl rounded-tl-sm border border-gray-100 shadow-sm text-gray-400 text-sm flex items-center gap-2">
-              <span className="animate-pulse w-2 h-2 bg-gray-300 rounded-full"></span>
-              <span className="animate-pulse w-2 h-2 bg-gray-300 rounded-full animation-delay-200"></span>
-              <span className="animate-pulse w-2 h-2 bg-gray-300 rounded-full animation-delay-400"></span>
-              <span className="ml-2">Synthesizing solutions...</span>
+            <div className="self-start mt-6 mb-12 bg-[#141414] px-6 py-4 rounded-2xl rounded-tl-sm border border-[#222] text-gray-500 text-sm flex items-center gap-2">
+              <span className="animate-pulse w-2 h-2 bg-gray-600 rounded-full"></span>
+              <span className="animate-pulse w-2 h-2 bg-gray-600 rounded-full animation-delay-200"></span>
+              <span className="animate-pulse w-2 h-2 bg-gray-600 rounded-full animation-delay-400"></span>
+              <span className="ml-2">Evaluating models...</span>
             </div>
           )}
           
@@ -221,11 +221,11 @@ export default function App() {
       </main>
 
       {/* Input Area Minimal */}
-      <footer className="flex-shrink-0 bg-white border-t border-gray-100 px-4 py-6 md:px-12 pb-8">
+      <footer className="flex-shrink-0 bg-[#0A0A0A] border-t border-[#222] px-4 py-6 md:px-12 pb-8">
         <div className="max-w-4xl mx-auto">
           <form 
             onSubmit={handleSubmit}
-            className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-2 py-2 shadow-sm focus-within:border-gray-300 focus-within:ring-4 focus-within:ring-gray-50 transition-all duration-300"
+            className="flex items-center gap-3 bg-[#111111] border border-[#333] rounded-2xl px-2 py-2 shadow-sm focus-within:border-gray-500 focus-within:bg-[#141414] transition-all duration-300"
           >
             <input
               type="text"
@@ -233,12 +233,12 @@ export default function App() {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask anything..."
               disabled={isLoading}
-              className="flex-1 bg-transparent border-none focus:outline-none px-4 py-3 text-gray-800 placeholder-gray-400 text-[15px]"
+              className="flex-1 bg-transparent border-none focus:outline-none px-4 py-3 text-gray-200 placeholder-gray-600 text-[15px]"
             />
             <button
               type="submit"
               disabled={isLoading || !input.trim()}
-              className="flex-shrink-0 flex items-center justify-center bg-gray-900 text-white rounded-xl px-5 py-3 text-sm font-medium transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className="flex-shrink-0 flex items-center justify-center bg-white text-black hover:bg-gray-200 rounded-xl px-5 py-3 text-sm font-medium transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             >
               Send
             </button>

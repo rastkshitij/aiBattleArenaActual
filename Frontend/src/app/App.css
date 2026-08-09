@@ -1,16 +1,13 @@
 @import "tailwindcss";
 
-/* We only need standard tailwind directives now.
-   All previous custom styling is removed for the minimal, seamless Tailwind design. */
-
 @layer base {
   body {
-    @apply bg-white text-gray-900 font-sans antialiased;
+    @apply bg-[#0A0A0A] text-gray-200 font-sans antialiased;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 }
 
-/* Minimal markdown styling */
+/* Minimal markdown styling for dark theme */
 .md-prose p {
   @apply mb-4 leading-relaxed;
 }
@@ -18,13 +15,13 @@
   @apply mb-0;
 }
 .md-prose strong {
-  @apply font-semibold text-gray-900;
+  @apply font-semibold text-gray-100;
 }
 .md-prose em {
-  @apply italic text-gray-700;
+  @apply italic text-gray-400;
 }
 .md-prose ul {
-  @apply list-disc pl-5 mb-4 space-y-1;
+  @apply list-disc pl-5 mb-4 space-y-1 text-gray-300;
 }
 .md-prose ul:last-child {
   @apply mb-0;
