@@ -1,20 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import './App.css'
-
+import axios from "axios"
 /* ─────────────────────────────────────────
    Sample Data
    ───────────────────────────────────────── */
-const INITIAL_RESULT = {
-  problem: "What is the capital of india",
-  solution_1: "The capital of **India** is **New Delhi**.\n\nNew Delhi is a part of the larger **National Capital Territory (NCT) of Delhi** and serves as the political and administrative center of the country. It houses key government institutions, including the **Rashtrapati Bhavan (President's House)**, **Parliament of India**, and the **Supreme Court of India**.\n\nWould you like more details about Delhi's history or landmarks? 😊",
-  solution_2: "The capital of India is **New Delhi**. It is the seat of the Government of India and is located within the National Capital Territory of Delhi. New Delhi is a major political, cultural, and commercial center in India.",
-  judge: {
-    solution_1_score: 10,
-    solution_2_score: 10,
-    solution_1_reasoning: "The response is completely accurate and provides useful additional context, such as the specific government institutions located in the capital. The formatting is clear and the tone is helpful.",
-    solution_2_reasoning: "The response is accurate and concise. It correctly identifies New Delhi as the capital and explains its administrative and geographic relationship to the National Capital Territory of Delhi."
-  }
-}
 
 /* ─────────────────────────────────────────
    Markdown renderer
@@ -135,19 +124,49 @@ function BattleCard({ result }) {
    Main App
    ───────────────────────────────────────── */
 export default function App() {
-  const [messages, setMessages] = useState([
-    { id: 'initial', problem: INITIAL_RESULT.problem, result: INITIAL_RESULT, error: null }
-  ])
+  const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const chatEndRef = useRef(null)
 
+function cleanMdAndLatex(text) {
+  return text
+    // Remove markdown symbols
+    .replace(/[#_*`~>-]/g, '')
+
+    // Remove links [text](url)
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+
+    // Remove LaTeX block delimiters \[ \]
+    .replace(/\\\[|\\\]/g, '')
+
+    // Replace LaTeX commands
+    .replace(/\\times/g, '×')
+    .replace(/\\cdot/g, '·')
+
+    // Remove inline LaTeX brackets \( \)
+    .replace(/\\\(|\\\)/g, '')
+
+    // Remove extra backslashes
+    .replace(/\\/g, '')
+
+    // Clean spacing
+    .replace(/\n+/g, '\n')
+    .trim();
+}
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, isLoading])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
+    const response =  await axios.post('http://localhost:3000/invoke' , {
+      input : input
+    } )
+    const data  =  response.data    
+    console.log(data)
+
     if (!input.trim() || isLoading) return
     const problem = input.trim()
     setInput('')
@@ -155,14 +174,23 @@ export default function App() {
     const id = Date.now()
     setMessages(prev => [...prev, { id, problem, result: null, error: null }])
     try {
-      const resp = await fetch('http://localhost:8000/battle', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ problem }),
-      })
-      if (!resp.ok) throw new Error('Battle server unreachable')
-      const data = await resp.json()
-      setMessages(prev => prev.map(m => m.id === id ? { ...m, result: data.result } : m))
+      // Temporary mock response until backend is connected
+      await new Promise(r => setTimeout(r, 1500))
+      
+      const sampleData = {
+        result: {
+          problem: problem,
+          solution_1: cleanMdAndLatex(data.result.solution_1),
+          solution_2: cleanMdAndLatex(data.result.solution_2),
+          judge: {
+            solution_1_score: data.result.judge.solution_1_score,
+            solution_2_score: data.result.judge.solution_2_score,
+            solution_1_reasoning: cleanMdAndLatex(data.result.judge.solution_1_reasoning),
+            solution_2_reasoning: cleanMdAndLatex(data.result.judge.solution_2_reasoning)
+        }
+      }
+    }   
+      setMessages(prev => prev.map(m => m.id === id ? { ...m, result: sampleData.result } : m))
     } catch (err) {
       setMessages(prev => prev.map(m => m.id === id ? { ...m, error: err.message } : m))
     } finally {
@@ -185,8 +213,20 @@ export default function App() {
 
       {/* Chat Flow */}
       <main className="flex-1 overflow-y-auto px-4 py-8 md:px-12 scroll-smooth">
-        <div className="max-w-4xl mx-auto flex flex-col pt-4">
+        <div className="max-w-4xl mx-auto flex flex-col pt-4 h-full">
           
+          {messages.length === 0 && !isLoading && (
+            <div className="flex flex-col items-center justify-center flex-1 h-full opacity-0 animate-[fadeIn_1s_ease-out_forwards] mt-32">
+              <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-[#141414] border border-[#222] text-gray-400 text-3xl mb-6 shadow-sm">
+                ❋
+              </div>
+              <h1 className="text-2xl font-semibold text-gray-200 mb-2">Welcome to AI Battle Arena</h1>
+              <p className="text-gray-500 text-[15px] max-w-md text-center leading-relaxed">
+                Send a message to pit two AI models against each other. An impartial judge will evaluate their responses.
+              </p>
+            </div>
+          )}
+
           {messages.map((msg) => (
             <div key={msg.id} className="flex flex-col w-full opacity-0 animate-[fadeIn_0.5s_ease-out_forwards]">
               {/* User message */}
