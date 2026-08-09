@@ -161,22 +161,21 @@ function cleanMdAndLatex(text) {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const response =  await axios.post('http://localhost:3000/invoke' , {
-      input : input
-    } )
-    const data  =  response.data    
-    console.log(data)
-
     if (!input.trim() || isLoading) return
+
     const problem = input.trim()
     setInput('')
     setIsLoading(true)
     const id = Date.now()
     setMessages(prev => [...prev, { id, problem, result: null, error: null }])
+
     try {
-      // Temporary mock response until backend is connected
-      await new Promise(r => setTimeout(r, 1500))
-      
+      const response = await axios.post('http://localhost:3000/invoke', {
+        input: problem,
+      })
+      const data = response.data
+      console.log(data)
+
       const sampleData = {
         result: {
           problem: problem,
@@ -186,10 +185,11 @@ function cleanMdAndLatex(text) {
             solution_1_score: data.result.judge.solution_1_score,
             solution_2_score: data.result.judge.solution_2_score,
             solution_1_reasoning: cleanMdAndLatex(data.result.judge.solution_1_reasoning),
-            solution_2_reasoning: cleanMdAndLatex(data.result.judge.solution_2_reasoning)
-        }
+            solution_2_reasoning: cleanMdAndLatex(data.result.judge.solution_2_reasoning),
+          },
+        },
       }
-    }   
+
       setMessages(prev => prev.map(m => m.id === id ? { ...m, result: sampleData.result } : m))
     } catch (err) {
       setMessages(prev => prev.map(m => m.id === id ? { ...m, error: err.message } : m))

@@ -1,9 +1,10 @@
 import express from "express";
 import graph from "./ai/graph.ai.js"
-import cors from "cors"
+import cors from "cors";
+import morgan from "morgan";
 const app = express()
 
-
+app.use(morgan("dev"))
 app.use(express.json())
 app.use(
   cors({
