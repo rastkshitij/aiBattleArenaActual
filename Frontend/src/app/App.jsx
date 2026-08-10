@@ -1,9 +1,11 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import AuthForm from '../components/AuthForm';
 import Sidebar from '../components/Sidebar';
 import ChatWindow from '../components/ChatWindow';
+import WelcomeIntro from '../components/WelcomeIntro';
 import { authApi, chatApi, aiApi } from '../services/api';
+import { AnimatePresence } from 'framer-motion';
 
 function cleanMdAndLatex(text) {
   if (!text) return '';
@@ -20,6 +22,14 @@ function cleanMdAndLatex(text) {
 }
 
 export default function App() {
+  const [showIntro, setShowIntro] = useState(() => {
+    try {
+      return !sessionStorage.getItem('hasSeenIntro');
+    } catch (e) {
+      return true;
+    }
+  });
+
   const [authMode, setAuthMode] = useState('login');
   const [user, setUser] = useState(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
@@ -172,16 +182,32 @@ export default function App() {
     }
   };
 
+  if (showIntro) {
+    return (
+      <AnimatePresence>
+        <WelcomeIntro onComplete={() => setShowIntro(false)} />
+      </AnimatePresence>
+    );
+  }
+
   if (isAuthLoading) {
-    return <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center text-gray-300">Loading...</div>;
+    return (
+      <div className="min-h-screen bg-[#040508] cyber-bg-grid flex flex-col items-center justify-center text-cyan-400 font-mono text-sm">
+        <div className="w-12 h-12 rounded-2xl bg-[#090e17] border border-cyan-500/40 glow-cyan flex items-center justify-center mb-4 animate-pulse">
+          <span className="w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+        </div>
+        <span>INITIALIZING ARENA SESSION...</span>
+      </div>
+    );
   }
 
   if (!user) {
     return (
       <>
         {authError && (
-          <div className="fixed top-4 left-1/2 -translate-x-1/2 bg-red-950/80 border border-red-800 text-red-200 px-4 py-2 rounded-lg text-sm">
-            {authError}
+          <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-red-950/90 border border-red-500 text-red-200 px-5 py-3 rounded-xl text-xs font-mono shadow-2xl backdrop-blur-md flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+            <span>{authError}</span>
           </div>
         )}
         <AuthForm
@@ -195,7 +221,7 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-screen bg-[#0A0A0A] text-gray-200">
+    <div className="flex h-screen bg-[#040508] text-gray-200 overflow-hidden">
       <Sidebar
         user={user}
         chats={chats}
