@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: '/',
+ baseURL: 'https://ai-battle-arena-actual-ten.vercel.app',
   withCredentials: true,
 });
 
