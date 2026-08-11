@@ -2,7 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "cd Frontend && npm install && npm run build"
+   "build": "cd Frontend && npm install && npm run build && cd ../Backend && npm install"
   },
   "dependencies": {
     "express": "^5.2.1",
