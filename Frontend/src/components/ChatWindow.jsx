@@ -18,27 +18,11 @@ import {
   BrainCircuit
 } from 'lucide-react';
 
-function renderMarkdown(text) {
+function renderInlineMarkdown(text) {
   if (!text) return null;
-  const paragraphs = text.split('\n\n');
-  return paragraphs.map((para, pIdx) => {
-    const lines = para.split('\n');
-    return (
-      <p key={pIdx} className="mb-4 last:mb-0 leading-relaxed">
-        {lines.map((line, lIdx) => (
-          <React.Fragment key={lIdx}>
-            {inlineMarkdown(line)}
-            {lIdx < lines.length - 1 && <br />}
-          </React.Fragment>
-        ))}
-      </p>
-    );
-  });
-}
 
-function inlineMarkdown(text) {
+  const regex = /(\*\*(.+?)\*\*|\*(.+?)\*|`(.+?)`)/g;
   const parts = [];
-  const regex = /(\*\*(.+?)\*\*|\*(.+?)\*)/g;
   let lastIndex = 0;
   let match;
 
@@ -46,19 +30,27 @@ function inlineMarkdown(text) {
     if (match.index > lastIndex) {
       parts.push(text.slice(lastIndex, match.index));
     }
+
     if (match[0].startsWith('**')) {
       parts.push(
-        <strong key={match.index} className="text-gray-100 font-semibold">
+        <strong key={`${match.index}-bold`} className="text-gray-100 font-semibold">
           {match[2]}
         </strong>
       );
+    } else if (match[0].startsWith('`')) {
+      parts.push(
+        <code key={`${match.index}-code`} className="md-inline-code">
+          {match[4]}
+        </code>
+      );
     } else {
       parts.push(
-        <em key={match.index} className="text-gray-400 italic">
+        <em key={`${match.index}-italic`} className="text-gray-400 italic">
           {match[3]}
         </em>
       );
     }
+
     lastIndex = regex.lastIndex;
   }
 
@@ -67,6 +59,122 @@ function inlineMarkdown(text) {
   }
 
   return parts;
+}
+
+function renderMarkdownTable(lines) {
+  const rows = lines
+    .filter((line) => line.includes('|'))
+    .map((line) =>
+      line
+        .split('|')
+        .slice(1, -1)
+        .map((cell) => cell.trim())
+    )
+    .filter((row) => row.some((cell) => cell.length > 0));
+
+  if (rows.length < 2) return null;
+
+  const [header, ...bodyRows] = rows;
+
+  return (
+    <div key={`table-${header.join('-')}`} className="overflow-x-auto my-5">
+      <table className="md-table">
+        <thead>
+          <tr>
+            {header.map((cell, index) => (
+              <th key={`header-${index}`}>{renderInlineMarkdown(cell)}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {bodyRows.map((row, rowIndex) => (
+            <tr key={`row-${rowIndex}`}>
+              {row.map((cell, cellIndex) => (
+                <td key={`cell-${rowIndex}-${cellIndex}`}>{renderInlineMarkdown(cell)}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function renderMarkdownList(lines, ordered = false) {
+  const items = lines.map((line, index) => {
+    const cleaned = ordered ? line.replace(/^\d+\.\s*/, '') : line.replace(/^[-*]\s*/, '');
+    return (
+      <li key={`${ordered ? 'ol' : 'ul'}-${index}`} className="md-list-item">
+        {renderInlineMarkdown(cleaned)}
+      </li>
+    );
+  });
+
+  const Tag = ordered ? 'ol' : 'ul';
+  return <Tag className={ordered ? 'md-ordered-list' : 'md-unordered-list'}>{items}</Tag>;
+}
+
+function renderMarkdown(text) {
+  if (!text) return null;
+
+  const blocks = [];
+  const sections = text.split(/\n\s*\n+/).filter((section) => section.trim());
+
+  sections.forEach((section, sectionIndex) => {
+    const lines = section
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
+
+    if (!lines.length) return;
+
+    const table = renderMarkdownTable(lines);
+    if (table) {
+      blocks.push(table);
+      return;
+    }
+
+    if (lines.length > 0 && lines.every((line) => /^[-*]\s+/.test(line))) {
+      blocks.push(<div key={`list-${sectionIndex}`}>{renderMarkdownList(lines, false)}</div>);
+      return;
+    }
+
+    if (lines.length > 0 && lines.every((line) => /^\d+\.\s+/.test(line))) {
+      blocks.push(<div key={`list-${sectionIndex}`}>{renderMarkdownList(lines, true)}</div>);
+      return;
+    }
+
+    if (lines.length === 1 && /^\d+\.\s+/.test(lines[0])) {
+      blocks.push(
+        <h4 key={`heading-${sectionIndex}`} className="md-heading md-heading-numbered">
+          {renderInlineMarkdown(lines[0].replace(/^\d+\.\s*/, ''))}
+        </h4>
+      );
+      return;
+    }
+
+    if (lines.length === 1 && /^#{1,6}\s+/.test(lines[0])) {
+      const level = lines[0].match(/^#+/)?.[0].length || 1;
+      const headingText = lines[0].replace(/^#{1,6}\s+/, '');
+
+      const HeadingTag = `h${Math.min(level, 4)}`;
+      blocks.push(
+        <HeadingTag key={`heading-${sectionIndex}`} className="md-heading">
+          {renderInlineMarkdown(headingText)}
+        </HeadingTag>
+      );
+      return;
+    }
+
+    const paragraphText = lines.join(' ');
+    blocks.push(
+      <p key={`paragraph-${sectionIndex}`} className="md-paragraph">
+        {renderInlineMarkdown(paragraphText)}
+      </p>
+    );
+  });
+
+  return <div className="md-prose">{blocks}</div>;
 }
 
 function ScoreBadge({ score, isWinner }) {
