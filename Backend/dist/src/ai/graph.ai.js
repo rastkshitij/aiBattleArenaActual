@@ -38,11 +38,11 @@ const judgeNode = async (state) => {
     const judgeResponse = await judge.invoke({
         messages: [
             new HumanMessage(`
-                Problem: ${problem}
-                Solution 1: ${solution_1}
-                Solution 2: ${solution_2}
-                Please evaluate the solutions and provide scores and reasoning.
-                `)
+            Problem: ${problem}
+            Solution 1: ${solution_1}
+            Solution 2: ${solution_2}
+            Please evaluate the solutions and provide scores and reasoning.
+        `)
         ]
     });
     const { solution_1_score, solution_2_score, solution_1_reasoning, solution_2_reasoning } = judgeResponse.structuredResponse;
