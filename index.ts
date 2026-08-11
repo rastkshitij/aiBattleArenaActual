@@ -1,9 +1,18 @@
+import express from "express";
 import app from "./Backend/src/app.js";
 import connectDB from "./Backend/src/config/db.js";
 
-const start = async () => {
-  await connectDB();
-  return app;
-};
+const handler = express();
 
-export default start;
+handler.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+handler.use(app);
+
+export default handler;
