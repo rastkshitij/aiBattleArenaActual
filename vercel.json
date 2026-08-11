@@ -1,15 +1,15 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "Backend/api/index.ts",
-      "use": "@vercel/node"
+  "buildCommand": "npm run build",
+  "functions": {
+    "Backend/api/index.ts": {
+      "runtime": "nodejs22.x"
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "Backend/api/index.ts"
+      "source": "/(.*)",
+      "destination": "/Backend/api/index.ts"
     }
   ]
 }
