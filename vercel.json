@@ -1,15 +1,3 @@
 {
-  "version": 2,
-  "buildCommand": "npm run build",
-  "functions": {
-    "Backend/api/index.ts": {
-      "runtime": "nodejs22.x"
-    }
-  },
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/Backend/api/index.ts"
-    }
-  ]
+  "version": 2
 }
