@@ -15,7 +15,7 @@ import { invokeAI } from "./controllers/ai.controller.js";
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const frontendDistPath = path.resolve(__dirname, "../../Frontend/dist");
+const frontendDistPath = path.resolve(process.cwd(), "Frontend/dist");
 
 app.use(morgan("dev"));
 app.use(express.json());
